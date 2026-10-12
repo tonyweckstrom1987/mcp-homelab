@@ -1,5 +1,9 @@
 # Changelog
 
+## [Julkaisematon]
+- Päivitetty vitest 5:een (korjaa kehitysriippuvuuksien npm audit -löydökset).
+- Node.js 20 poistettu tuettujen versioiden listalta (vitest 5 vaatii Node 22.12+).
+
 ## [0.1.1] - 2026-10-12
 
 ### Added
