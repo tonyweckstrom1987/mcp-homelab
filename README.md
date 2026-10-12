@@ -8,7 +8,7 @@ Vain-luku [MCP](https://modelcontextprotocol.io)-palvelin [Proxmox VE](https://w
 
 **Teknologiat:** TypeScript, Node.js 20/22/24, Model Context Protocol (stdio), Proxmox VE API, vitest. Lisenssi: [LICENSE](./LICENSE).
 
-> **Tila:** Testattu yksikkötesteillä ja simuloidulla Proxmox-rajapinnalla. Oikeaa Proxmox-palvelinta vastaan sitä ei ole vielä kokeiltu.
+> **Tila:** Testattu yksikkötesteillä ja oikealla Proxmox VE 9.2 -palvelimella 12.10.2026. Kaikki neljä MCP-työkalua (`list_nodes`, `node_status`, `list_containers` ja `container_status`) toimivat.
 
 ## Työkalut
 
@@ -74,7 +74,19 @@ npm run build
 }
 ```
 
+**Huom:** Shellin ympäristömuuttujat eivät välity MCP Inspectorille, Claude Desktopille tai Cursorille. Anna Proxmox-yhteyden arvot MCP-asiakkaan asetusten `env`-lohkossa.
+
 Korvaa `/POLKU/` omalla polullasi.
+
+### Smoke-testi oikeaa Proxmoxia vastaan
+
+Kun olet kääntänyt projektin ja asettanut kaikki neljä yllä mainittua `PROXMOX_*`-ympäristömuuttujaa shellissä, aja repon juuresta:
+
+```bash
+npm run smoke
+```
+
+Komento käynnistää MCP-palvelimen ja kutsuu kaikkia neljää työkalua oikeaa Proxmox-palvelinta vastaan. Varmista, että solmu `agenttifirma` ja LXC-kontti `110` ovat käytettävissä testipalvelimellasi.
 
 ## Kehitys
 
@@ -87,4 +99,3 @@ npm run dev       # käynnistys lähdekoodista
 ## Tunnetut rajoitukset
 
 - Tukee toistaiseksi vain LXC-kontteja, ei virtuaalikoneita (QEMU).
-- Ei ole kokeiltu oikeaa Proxmox-palvelinta vastaan.

@@ -20,7 +20,7 @@ function fail(err: unknown) {
  * Yksikään työkalu ei käynnistä, sammuta tai muuta mitään.
  */
 export function createServer(client: ProxmoxClient): McpServer {
-  const server = new McpServer({ name: "mcp-homelab", version: "0.1.0" });
+  const server = new McpServer({ name: "mcp-homelab", version: "0.1.1" });
 
   server.registerTool(
     "list_nodes",
