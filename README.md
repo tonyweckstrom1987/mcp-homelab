@@ -6,7 +6,7 @@ Vain-luku [MCP](https://modelcontextprotocol.io)-palvelin [Proxmox VE](https://w
 
 **English summary:** A read-only MCP server for Proxmox VE. It lets an AI assistant list nodes and LXC containers and read their status and resource usage. It only sends HTTP GET requests, so it cannot start, stop or change anything. Use a Proxmox API token with the `PVEAuditor` role for an extra layer of safety.
 
-**Teknologiat:** TypeScript, Node.js 20/22/24, Model Context Protocol (stdio), Proxmox VE API, vitest. Lisenssi: [LICENSE](./LICENSE).
+**Teknologiat:** TypeScript, Node.js 22/24, Model Context Protocol (stdio), Proxmox VE API, vitest. Lisenssi: [LICENSE](./LICENSE).
 
 > **Tila:** Testattu yksikkötesteillä ja oikealla Proxmox VE 9.2 -palvelimella 12.10.2026. Kaikki neljä MCP-työkalua (`list_nodes`, `node_status`, `list_containers` ja `container_status`) toimivat.
 
