@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.1.1] - 2026-10-12
+
+### Added
+- Testattu oikealla Proxmox VE 9.2 -palvelimella PVEAuditor-tokenilla Tailscale HTTPS -yhteyden kautta; kaikki neljä MCP-työkalua toimivat.
+- Lisätty ohje MCP-asiakkaan `env`-asetuksista sekä smoke-testi oikeaa Proxmoxia vastaan.
+
 ## [0.1.0] - 2026-10-12
 
 First working version.
