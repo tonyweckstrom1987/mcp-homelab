@@ -22,6 +22,27 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ProxmoxConfig 
     throw new Error(`Puuttuvat ympäristömuuttujat: ${missing.join(", ")}`);
   }
 
+  if (!/^https?:\/\//i.test(baseUrl as string)) {
+    throw new Error("Invalid PROXMOX_URL: provide a complete HTTPS URL.");
+  }
+
+  let proxmoxUrl: URL;
+  try {
+    proxmoxUrl = new URL(baseUrl as string);
+  } catch {
+    throw new Error("Invalid PROXMOX_URL: provide a complete HTTPS URL.");
+  }
+
+  const allowHttp = (env.PROXMOX_ALLOW_HTTP ?? "").trim().toLowerCase() === "true";
+  if (proxmoxUrl.protocol === "http:" && !allowHttp) {
+    throw new Error(
+      "PROXMOX_URL must use HTTPS. Set PROXMOX_ALLOW_HTTP=true only for trusted isolated networks.",
+    );
+  }
+  if (proxmoxUrl.protocol !== "https:" && proxmoxUrl.protocol !== "http:") {
+    throw new Error("Invalid PROXMOX_URL: only HTTPS is supported unless HTTP is explicitly allowed.");
+  }
+
   return {
     baseUrl: (baseUrl as string).replace(/\/+$/, ""),
     tokenId: tokenId as string,

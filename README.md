@@ -53,6 +53,7 @@ npm run build
 | `PROXMOX_URL` | Proxmoxin osoite, esim. `https://192.168.1.10:8006` |
 | `PROXMOX_TOKEN_ID` | Tokenin tunniste, esim. `mcp@pve!homelab` |
 | `PROXMOX_TOKEN_SECRET` | Tokenin salaisuus |
+| `PROXMOX_ALLOW_HTTP` | `true` sallii HTTP-yhteyden erikseen (vain luotetussa, eristetyssä verkossa; HTTPS on oletus ja suositus) |
 | `PROXMOX_INSECURE_TLS` | `true`, jos Proxmox käyttää itse allekirjoitettua sertifikaattia (oletus `false`) |
 
 ### Claude Desktop / Cursor
