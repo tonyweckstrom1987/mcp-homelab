@@ -15,6 +15,8 @@ function fail(err: unknown) {
   return { isError: true, content: [{ type: "text" as const, text: errorMessage(err) }] };
 }
 
+const nodeNameSchema = z.string().regex(/^[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?$/);
+
 /**
  * Rakentaa MCP-palvelimen, jossa on neljä vain-luku-työkalua Proxmoxille.
  * Yksikään työkalu ei käynnistä, sammuta tai muuta mitään.
@@ -44,7 +46,7 @@ export function createServer(client: ProxmoxClient): McpServer {
     {
       title: "Solmun tila",
       description: "Palauttaa yhden solmun yksityiskohtaisen tilan JSON-muodossa.",
-      inputSchema: { node: z.string().min(1).describe("Solmun nimi, esim. 'pve'") },
+      inputSchema: { node: nodeNameSchema.describe("Solmun nimi, esim. 'pve'") },
     },
     async ({ node }) => {
       try {
@@ -60,7 +62,7 @@ export function createServer(client: ProxmoxClient): McpServer {
     {
       title: "Listaa LXC-kontit",
       description: "Listaa solmun LXC-kontit, niiden tilan sekä prosessorin, muistin ja levyn käytön.",
-      inputSchema: { node: z.string().min(1).describe("Solmun nimi, esim. 'pve'") },
+      inputSchema: { node: nodeNameSchema.describe("Solmun nimi, esim. 'pve'") },
     },
     async ({ node }) => {
       try {
@@ -78,8 +80,8 @@ export function createServer(client: ProxmoxClient): McpServer {
       title: "Kontin tila",
       description: "Palauttaa yhden LXC-kontin nykyisen tilan ja resurssien käytön.",
       inputSchema: {
-        node: z.string().min(1).describe("Solmun nimi, esim. 'pve'"),
-        vmid: z.number().int().positive().describe("Kontin numero (VMID), esim. 100"),
+        node: nodeNameSchema.describe("Solmun nimi, esim. 'pve'"),
+        vmid: z.number().int().min(100).max(999_999_999).describe("Kontin numero (VMID), esim. 100"),
       },
     },
     async ({ node, vmid }) => {

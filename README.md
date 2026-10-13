@@ -24,6 +24,7 @@ Vain-luku [MCP](https://modelcontextprotocol.io)-palvelin [Proxmox VE](https://w
 - Palvelin lähettää vain GET-pyyntöjä. Yksikään työkalu ei käynnistä, sammuta, luo tai poista mitään.
 - Anna silti tokenille vain lukuoikeus (rooli `PVEAuditor`), jotta oikeudet rajoittuvat myös Proxmoxin puolella.
 - Tokenin salaisuus annetaan ympäristömuuttujana, eikä sitä kirjata lokeihin tai virheilmoituksiin.
+- `PROXMOX_INSECURE_TLS=true` ohittaa TLS-varmenteen tarkistuksen ja altistaa yhteyden väliintulohyökkäykselle. Suosi aina voimassa olevaa varmennetta; Tailscale-verkossa voit tarjota Proxmoxin HTTPS-yhteyden `tailscale serve` -komennolla. Ohituksesta tulostetaan varoitus standardivirtaan.
 
 ## Proxmoxin valmistelu
 
@@ -53,6 +54,7 @@ npm run build
 | `PROXMOX_URL` | Proxmoxin osoite, esim. `https://192.168.1.10:8006` |
 | `PROXMOX_TOKEN_ID` | Tokenin tunniste, esim. `mcp@pve!homelab` |
 | `PROXMOX_TOKEN_SECRET` | Tokenin salaisuus |
+| `PROXMOX_ALLOW_HTTP` | `true` sallii HTTP-yhteyden erikseen (vain luotetussa, eristetyssä verkossa; HTTPS on oletus ja suositus) |
 | `PROXMOX_INSECURE_TLS` | `true`, jos Proxmox käyttää itse allekirjoitettua sertifikaattia (oletus `false`) |
 
 ### Claude Desktop / Cursor

@@ -3,9 +3,11 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { loadConfig } from "./config.js";
 import { ProxmoxClient } from "./proxmox/client.js";
 import { createServer } from "./server.js";
+import { warnIfInsecureTls } from "./startup.js";
 
 async function main(): Promise<void> {
   const config = loadConfig();
+  warnIfInsecureTls(config.insecureTls);
   const server = createServer(new ProxmoxClient(config));
   await server.connect(new StdioServerTransport());
 }
