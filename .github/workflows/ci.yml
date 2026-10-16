@@ -35,5 +35,18 @@ jobs:
       - name: Testit
         run: npm test
 
+      - name: Tarkista MCP-palvelin (mcp-doctor, ei yhteyttä Proxmoxiin)
+        if: matrix.node-version == 24
+        uses: tonyweckstrom1987/mcp-doctor@7fcc3aa8881ff5894788af4a0fefec8304342af8
+        env:
+          # Keksityt arvot: palvelin vain käynnistyy ja listaa työkalunsa, Proxmoxiin ei oteta yhteyttä.
+          PROXMOX_URL: https://proxmox.invalid:8006
+          PROXMOX_TOKEN_ID: ci@pve!ci
+          PROXMOX_TOKEN_SECRET: 00000000-0000-0000-0000-000000000000
+        with:
+          command: node dist/index.js
+          env-names: PROXMOX_URL PROXMOX_TOKEN_ID PROXMOX_TOKEN_SECRET
+          strict: "true"
+
       - name: Audit
         run: npm audit --omit=dev --audit-level=high
