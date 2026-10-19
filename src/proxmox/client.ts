@@ -37,6 +37,16 @@ function defaultFetch(insecureTls: boolean): FetchLike {
     undiciFetch(url, { ...init, dispatcher }) as unknown as ReturnType<FetchLike>;
 }
 
+function describeFetchError(err: unknown): string {
+  if (!(err instanceof Error)) return String(err);
+  const cause = err.cause;
+  if (cause instanceof Error) {
+    const code = (cause as NodeJS.ErrnoException).code;
+    return code ? `${cause.message} (${code})` : cause.message;
+  }
+  return err.message;
+}
+
 /**
  * Pieni vain-luku-asiakas Proxmoxin API:lle.
  * Käyttää AINOASTAAN GET-pyyntöjä, joten se ei voi muuttaa palvelimen tilaa.
@@ -54,20 +64,34 @@ export class ProxmoxClient {
 
   private async get<T>(path: string): Promise<T> {
     const url = `${this.config.baseUrl}/api2/json${path}`;
-    const response = await this.fetchImpl(url, {
-      method: "GET",
-      headers: {
-        Authorization: `PVEAPIToken=${this.config.tokenId}=${this.config.tokenSecret}`,
-        Accept: "application/json",
-      },
-      signal: AbortSignal.timeout(this.timeoutMs),
-    });
+    let response: Awaited<ReturnType<FetchLike>>;
+    try {
+      response = await this.fetchImpl(url, {
+        method: "GET",
+        headers: {
+          Authorization: `PVEAPIToken=${this.config.tokenId}=${this.config.tokenSecret}`,
+          Accept: "application/json",
+        },
+        signal: AbortSignal.timeout(this.timeoutMs),
+      });
+    } catch (err) {
+      // undici kätkee todellisen syyn (esim. itse allekirjoitettu sertifikaatti) kenttään `cause`.
+      throw new Error(`Yhteys Proxmoxiin epäonnistui (${path}): ${describeFetchError(err)}`);
+    }
     if (!response.ok) {
       // Ei sisällytetä pyyntöotsakkeita virheeseen, jotta salaisuus ei vuoda.
       throw new Error(`Proxmox vastasi virheellä ${response.status} ${response.statusText} (${path})`);
     }
-    const body = (await response.json()) as { data: T };
-    return body.data;
+    let body: unknown;
+    try {
+      body = await response.json();
+    } catch {
+      throw new Error(`Proxmoxin vastaus ei ollut JSON-muotoista (${path})`);
+    }
+    if (typeof body !== "object" || body === null || !("data" in body) || body.data == null) {
+      throw new Error(`Proxmoxin vastauksesta puuttuu data-kenttä (${path})`);
+    }
+    return body.data as T;
   }
 
   listNodes(): Promise<NodeSummary[]> {

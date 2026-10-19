@@ -50,4 +50,29 @@ describe("loadConfig", () => {
       "PROXMOX_TOKEN_ID, PROXMOX_TOKEN_SECRET",
     );
   });
+
+  it("tunnistaa PROXMOX_INSECURE_TLS=true myös ympäröivien välilyöntien kanssa", () => {
+    expect(loadConfig({ ...base, PROXMOX_INSECURE_TLS: " true " }).insecureTls).toBe(true);
+  });
+
+  it("merkitsee salaamattoman http:n (plainHttp) ja https:n ei", () => {
+    expect(loadConfig(base).plainHttp).toBe(false);
+    expect(
+      loadConfig({ ...base, PROXMOX_URL: "http://pve.local:8006", PROXMOX_ALLOW_HTTP: "true" }).plainHttp,
+    ).toBe(true);
+  });
+
+  it.each([
+    "https://pve.local:8006/?x=1",
+    "https://pve.local:8006/#osa",
+    "https://kayttaja:salasana@pve.local:8006",
+  ])("hylkää osoitteen, jossa on kysely, osa tai tunnukset: %s", (url) => {
+    expect(() => loadConfig({ ...base, PROXMOX_URL: url })).toThrow("Invalid PROXMOX_URL");
+  });
+
+  it("säilyttää käänteisen välityspalvelimen polun ja poistaa lopun kauttaviivat", () => {
+    expect(loadConfig({ ...base, PROXMOX_URL: "https://host.example/pve//" }).baseUrl).toBe(
+      "https://host.example/pve",
+    );
+  });
 });
