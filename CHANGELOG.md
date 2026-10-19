@@ -1,6 +1,14 @@
 # Changelog
 
 ## [Julkaisematon]
+- Korjaukset yöjonon koodikatselmoinnin (19.10.2026) löydöksistä:
+  - Varoitus käynnistyksessä, kun `PROXMOX_ALLOW_HTTP=true` ja osoite on `http:` (token kulkee selkotekstinä).
+  - Verkko- ja TLS-virheet näyttävät todellisen syyn (esim. `self-signed certificate`) eikä pelkkää `fetch failed`.
+  - Proxmoxin vastaus validoidaan: ei-JSON ja puuttuva `data` antavat selkeän virheen.
+  - `PROXMOX_URL` jäsennetään `URL`-oliolla; kysely, osa (`#`) ja tunnukset osoitteessa hylätään käynnistyksessä. Kuollut koodi poistettu.
+  - `PROXMOX_INSECURE_TLS` trimmataan kuten `PROXMOX_ALLOW_HTTP`.
+  - Julkaisutyönkulku: tagin nimi annetaan ympäristömuuttujana (ei shell-injektiota) ja tagin on vastattava `package.json`-versiota.
+  - GitHub Actions kiinnitetty commit-tarkisteeseen; `mcp-doctor` päivitetty versioon 0.3.0.
 - Päivitetty vitest 5:een (korjaa kehitysriippuvuuksien npm audit -löydökset).
 - Node.js 20 poistettu tuettujen versioiden listalta (vitest 5 vaatii Node 22.12+).
 

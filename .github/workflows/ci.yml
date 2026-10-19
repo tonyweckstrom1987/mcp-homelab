@@ -15,10 +15,10 @@ jobs:
       matrix:
         node-version: [22, 24]
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Aseta Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
@@ -37,7 +37,7 @@ jobs:
 
       - name: Tarkista MCP-palvelin (mcp-doctor, ei yhteyttä Proxmoxiin)
         if: matrix.node-version == 24
-        uses: tonyweckstrom1987/mcp-doctor@7fcc3aa8881ff5894788af4a0fefec8304342af8
+        uses: tonyweckstrom1987/mcp-doctor@6a5f09575dcda006cd661a9906278b42f8ea336e # v0.3.0
         env:
           # Keksityt arvot: palvelin vain käynnistyy ja listaa työkalunsa, Proxmoxiin ei oteta yhteyttä.
           PROXMOX_URL: https://proxmox.invalid:8006

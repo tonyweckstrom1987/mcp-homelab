@@ -6,6 +6,7 @@ const config = {
   tokenId: "mcp@pve!homelab",
   tokenSecret: "salainen",
   insecureTls: false,
+  plainHttp: false,
 };
 
 function mockFetch(data: unknown, status = 200) {
@@ -52,5 +53,33 @@ describe("ProxmoxClient", () => {
     const client = new ProxmoxClient(config, fn);
     await expect(client.listNodes()).rejects.toThrow("401");
     await expect(client.listNodes()).rejects.not.toThrow("salainen");
+  });
+
+  it("näyttää verkkovirheen todellisen syyn (cause) eikä pelkkää 'fetch failed'", async () => {
+    const fn: FetchLike = async () => {
+      const cause = Object.assign(new Error("self-signed certificate"), { code: "DEPTH_ZERO_SELF_SIGNED_CERT" });
+      throw new TypeError("fetch failed", { cause });
+    };
+    const client = new ProxmoxClient(config, fn);
+    await expect(client.listNodes()).rejects.toThrow(
+      "Yhteys Proxmoxiin epäonnistui (/nodes): self-signed certificate (DEPTH_ZERO_SELF_SIGNED_CERT)",
+    );
+  });
+
+  it("antaa selkeän virheen, kun vastaus ei ole JSON:ia", async () => {
+    const fn: FetchLike = async () => ({
+      ok: true,
+      status: 200,
+      statusText: "OK",
+      json: async () => {
+        throw new SyntaxError("Unexpected token <");
+      },
+    });
+    await expect(new ProxmoxClient(config, fn).listNodes()).rejects.toThrow("ei ollut JSON-muotoista");
+  });
+
+  it.each([{}, { data: null }, "teksti", null])("antaa selkeän virheen, kun vastauksesta puuttuu data: %j", async (body) => {
+    const fn: FetchLike = async () => ({ ok: true, status: 200, statusText: "OK", json: async () => body });
+    await expect(new ProxmoxClient(config, fn).listNodes()).rejects.toThrow("puuttuu data-kenttä");
   });
 });

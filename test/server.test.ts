@@ -4,7 +4,7 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js";
 import { createServer } from "../src/server.js";
 import { ProxmoxClient, type FetchLike } from "../src/proxmox/client.js";
 
-const config = { baseUrl: "https://pve.local:8006", tokenId: "t@pve!x", tokenSecret: "s", insecureTls: false };
+const config = { baseUrl: "https://pve.local:8006", tokenId: "t@pve!x", tokenSecret: "s", insecureTls: false, plainHttp: false };
 
 function fakeProxmox(calls: string[] = []): FetchLike {
   return async (url) => {

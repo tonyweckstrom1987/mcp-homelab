@@ -7,6 +7,8 @@ export interface ProxmoxConfig {
   tokenSecret: string;
   /** Sallii itse allekirjoitetun TLS-sertifikaatin (Proxmoxin oletus). */
   insecureTls: boolean;
+  /** Totta, kun osoite on http: (PROXMOX_ALLOW_HTTP=true): token kulkee salaamattomana. */
+  plainHttp: boolean;
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): ProxmoxConfig {
@@ -22,6 +24,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ProxmoxConfig 
     throw new Error(`Puuttuvat ympäristömuuttujat: ${missing.join(", ")}`);
   }
 
+  // WHATWG URL hyväksyy myös muodon "https:/host", joten kaksoiskauttaviiva tarkistetaan erikseen.
   if (!/^https?:\/\//i.test(baseUrl as string)) {
     throw new Error("Invalid PROXMOX_URL: provide a complete HTTPS URL.");
   }
@@ -32,6 +35,11 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ProxmoxConfig 
   } catch {
     throw new Error("Invalid PROXMOX_URL: provide a complete HTTPS URL.");
   }
+  if (proxmoxUrl.username || proxmoxUrl.password || proxmoxUrl.search || proxmoxUrl.hash) {
+    throw new Error(
+      "Invalid PROXMOX_URL: use only scheme, host, port and optional path (no credentials, query or fragment).",
+    );
+  }
 
   const allowHttp = (env.PROXMOX_ALLOW_HTTP ?? "").trim().toLowerCase() === "true";
   if (proxmoxUrl.protocol === "http:" && !allowHttp) {
@@ -39,14 +47,12 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): ProxmoxConfig 
       "PROXMOX_URL must use HTTPS. Set PROXMOX_ALLOW_HTTP=true only for trusted isolated networks.",
     );
   }
-  if (proxmoxUrl.protocol !== "https:" && proxmoxUrl.protocol !== "http:") {
-    throw new Error("Invalid PROXMOX_URL: only HTTPS is supported unless HTTP is explicitly allowed.");
-  }
 
   return {
-    baseUrl: (baseUrl as string).replace(/\/+$/, ""),
+    baseUrl: `${proxmoxUrl.origin}${proxmoxUrl.pathname}`.replace(/\/+$/, ""),
     tokenId: tokenId as string,
     tokenSecret: tokenSecret as string,
-    insecureTls: (env.PROXMOX_INSECURE_TLS ?? "").toLowerCase() === "true",
+    insecureTls: (env.PROXMOX_INSECURE_TLS ?? "").trim().toLowerCase() === "true",
+    plainHttp: proxmoxUrl.protocol === "http:",
   };
 }
