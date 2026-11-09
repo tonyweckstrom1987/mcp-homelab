@@ -37,7 +37,7 @@ jobs:
 
       - name: Tarkista MCP-palvelin (mcp-doctor, ei yhteyttä Proxmoxiin)
         if: matrix.node-version == 24
-        uses: tonyweckstrom1987/mcp-doctor@6a5f09575dcda006cd661a9906278b42f8ea336e # v0.3.0
+        uses: tonyweckstrom1987/mcp-doctor@2931165d2341a4875c3650f3fba82e9a9a3dcab5 # v0.5.0
         env:
           # Keksityt arvot: palvelin vain käynnistyy ja listaa työkalunsa, Proxmoxiin ei oteta yhteyttä.
           PROXMOX_URL: https://proxmox.invalid:8006
